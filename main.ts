@@ -1,4 +1,11 @@
 /*
+    /* Made from pxt-ucl-junkrobot and Learning Developments tutorial on stepper motors
+    /* https://github.com/chevyng/pxt-ucl-junkrobot/blob/master/main.ts
+    /* https://learningdevelopments.co.nz/blogs/lessons/stepper-motor-control-with-the-micro-bit
+    /*
+    /* And much help from Sparkfun's tutorial on building extensions in MakeCode
+    /* https://learn.sparkfun.com/tutorials/how-to-create-a-makecode-package-for-microbit/all
+    /* Much love from Tinkercademy
 */
 
 enum stepUnit {
@@ -8,8 +15,15 @@ enum stepUnit {
     Rotations
 }
 
+enum direction {
+    //% block="clockwise"
+    Clockwise,
+    //% block="anticlockwise"
+    AntiClockwise
+}
+
 //% color=#1f49bf icon="\uf013"
-namespace stepperMotor {
+namespace Stepper_DRV8834 {
 
     export class Motor {
 
@@ -18,7 +32,7 @@ namespace stepperMotor {
         private input3: DigitalPin;
         private input4: DigitalPin;
         private input5: DigitalPin;
-        private state: number;
+        private delay: number;
 
         setPins(steps: DigitalPin, dir: DigitalPin, M0: DigitalPin, M1: DigitalPin, sleep: DigitalPin): void {
             // send pulse
@@ -29,10 +43,6 @@ namespace stepperMotor {
             this.input5 = sleep;
         }
 
-        setState(stateNum: number): void {
-            this.state = stateNum;
-        }
-
         //% blockId=set_motor_calibration block="%motor|set delay between steps to %delayNum|ms"
         //% weight=60 blockGap=8
         setDelay(delayNum: number): void {
@@ -41,81 +51,26 @@ namespace stepperMotor {
 
         /* Functions for running a stepper motor by steps */
 
-        steps(direction: number): void {
-            if (this.state == 0) {
-                pins.digitalWritePin(this.input1, 0);
-                pins.digitalWritePin(this.input2, 0);
-                pins.digitalWritePin(this.input3, 0);
-                pins.digitalWritePin(this.input4, 0);
-            } else if (this.state == 1) {
-                pins.digitalWritePin(this.input1, 1);
-                pins.digitalWritePin(this.input2, 0);
-                pins.digitalWritePin(this.input3, 0);
-                pins.digitalWritePin(this.input4, 1);
-            } else if (this.state == 2) {
-                pins.digitalWritePin(this.input1, 0);
-                pins.digitalWritePin(this.input2, 0);
-                pins.digitalWritePin(this.input3, 1);
-                pins.digitalWritePin(this.input4, 1);
-            } else if (this.state == 3) {
-                pins.digitalWritePin(this.input1, 0);
-                pins.digitalWritePin(this.input2, 1);
-                pins.digitalWritePin(this.input3, 1);
-                pins.digitalWritePin(this.input4, 0);
-            } else if (this.state == 4) {
-                pins.digitalWritePin(this.input1, 1);
-                pins.digitalWritePin(this.input2, 1);
-                pins.digitalWritePin(this.input3, 0);
-                pins.digitalWritePin(this.input4, 0);
-            }
-
-            this.state = this.state + direction;
-            if (this.state < 1) {
-                this.state = 4;
-            } else if (this.state > 4) {
-                this.state = 1;
-            }
-
-        }
-
-        //% blockId=moveAntiClockwise block="move %motor| %steps|%unit| anti-clockwise"
-        //% weight=85 blockGap=8
-        moveAntiClockwise(steps: number, unit: stepUnit): void {
-
-            switch (unit) {
-                case stepUnit.Rotations: steps = steps * 2056; //2056 steps = approximately 1 round
-                case stepUnit.Steps: steps = steps;
-            }
-
-            for (let i = 0; i < steps; i++) {
-                this.steps(1);
-                basic.pause(this.delay);
-            }
-
-            this.state = 0;
-        }
-
-        //% blockId=moveClockwise block="move %motor| %steps|%unit| clockwise"
+        //% blockId=moveMotor block="move %motor| %steps|%unit|%dir| "
         //% weight=84 blockGap=8
-        moveClockwise(steps: number, unit: stepUnit): void {
+        moveMotor(steps: number, unit: stepUnit, dir: direction): void {
 
             switch (unit) {
                 case stepUnit.Rotations: steps = steps * 2056; //2056 steps = approximately 1 round
                 case stepUnit.Steps: steps = steps;
             }
 
-            for (let i = 0; i < steps; i++) {
-                this.steps(-1);
-                basic.pause(this.delay);
+            switch (dir) {
+                case direction.Clockwise: pins.digitalWritePin(this.input3, 1);
+                case direction.AntiClockwise: pins.digitalWritePin(this.input3, 0);
             }
 
-            this.state = 0;
-        }
-
-        //% blockId=stopMotor block="stop %motor"
-        //% weight=70 blockGap=8
-        stopMotor(): void {
-            this.state = 0;
+            for (let i = 0; i < steps; i++) {
+                pins.digitalWritePin(this.input1, 1);
+                basic.pause(this.delay/2);
+                pins.digitalWritePin(this.input1, 0);
+                basic.pause(this.delay/2);
+            }
         }
 
 
@@ -123,17 +78,17 @@ namespace stepperMotor {
 
     /**
      * Create a new stepper motor with connected pins at @param.
-     * @param 4 pins where the motor is connected.
+     * @param 5 pins where the motor is connected.
      */
-    //% blockId="stepperMotor_setMotor" block="DRV8834 | steps %in1|dir %in2|M1 %in3|M0 %in4"
+    //% blockId="stepperMotor_setMotor" block="DRV8834 | steps %steps|dir %dir|M1 %M1|M0 %M0||sleep %sleep"
     //% weight=90 blockGap=8
     //% parts="motor"
     //% blockSetVariable=motor
-    export function createMotor(in1: DigitalPin, in2: DigitalPin, in3: DigitalPin, in4: DigitalPin): Motor {
+    //% expandableArgumentMode="toggle"
+    export function createMotor(steps: DigitalPin, dir: DigitalPin, M0: DigitalPin, M1: DigitalPin, sleep: DigitalPin): Motor {
         let motor = new Motor();
-        motor.setPins(in1, in2, in3, in4);
-        motor.setState(0);
-        motor.setDelay(1);
+        motor.setPins(steps, dir, M0, M1, sleep);
+        motor.setDelay(10);
         return motor;
     }
 
