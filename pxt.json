@@ -1,5 +1,5 @@
 {
-    "name": "Ohne Titel",
+    "name": "Polulu DRV8834",
     "description": "",
     "dependencies": {
         "core": "*",
@@ -16,5 +16,5 @@
     "supportedTargets": [
         "calliopemini"
     ],
-    "preferredEditor": "blocksprj"
+    "preferredEditor": "tsprj"
 }
