@@ -71,9 +71,10 @@ namespace Polulu_DRV8834 {
                 case stepUnit.Steps: steps = steps;
             }
 
-            switch (dir) {
-                case direction.Clockwise: pins.digitalWritePin(this.input2, 1);
-                case direction.AntiClockwise: pins.digitalWritePin(this.input2, 0);
+            if(dir == direction.Clockwise) {
+                pins.digitalWritePin(this.input2, 0);
+            } else {
+                pins.digitalWritePin(this.input2, 1);
             }
 
             for (let i = 0; i < steps; i++) {
