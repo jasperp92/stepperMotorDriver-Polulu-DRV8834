@@ -1,5 +1,28 @@
+# Polulu DRV8834
 
-> Diese Seite bei [https://jasperp92.github.io/steppermotordriver-polulu-drv8834/](https://jasperp92.github.io/steppermotordriver-polulu-drv8834/) öffnen
+This is an extension for the Polulu DRV8834 to control bipolar stepper motors from 2.5 up to 10.8 V.
+code based on and inspired by Tinkertanker https://github.com/tinkertanker/pxt-stepper-motor
+
+## Wiring
+
+The library is configured for the 5 pins STEP, DIR, M0, M1 and SLEEP. Sleep can either be connected to a digital pin or the logic power supply, so the pin configuration is optional. The same for M0 and M1 which determines the step mode. If both are low the motor moves per default in fullstep mode.
+
+![wiring scheme](https://www.exp-tech.de/media/image/72/40/7a/POLOLU-DRV8834_8_600x600_600x600.jpg)
+
+## Usage
+
+### setPins
+
+configure the pins for the driver at the start
+
+´´´blocks
+createMotor(steps: DigitalPin, dir: DigitalPin, M0: DigitalPin, M1: DigitalPin, sleep?: DigitalPin): Motor {
+        let motor = new Motor();
+        motor.setPins(steps, dir, M0, M1, sleep);
+        motor.setDelay(10);
+        motor.setStepsPerRevolution(4650);
+        return motor;
+´´´
 
 ## Als Erweiterung verwenden
 
