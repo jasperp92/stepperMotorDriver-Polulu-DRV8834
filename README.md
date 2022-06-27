@@ -11,18 +11,31 @@ The library is configured for the 5 pins STEP, DIR, M0, M1 and SLEEP. Sleep can 
 
 ## Usage
 
-### setPins
+### createMotor
 
-configure the pins for the driver at the start
+Configure the pins for the driver at the start
 
-´´´blocks
-createMotor(steps: DigitalPin, dir: DigitalPin, M0: DigitalPin, M1: DigitalPin, sleep?: DigitalPin): Motor {
-        let motor = new Motor();
-        motor.setPins(steps, dir, M0, M1, sleep);
-        motor.setDelay(10);
-        motor.setStepsPerRevolution(4650);
-        return motor;
-´´´
+```blocks
+let motor = Polulu_DRV8834.createMotor(
+DigitalPin.P0,
+DigitalPin.P1,
+DigitalPin.P2,
+DigitalPin.P3
+```
+
+### moveMotor
+
+Move the motor in steps or in full rotations, clockwise or counter-clockwise 
+
+```blocks
+input.onButtonPressed(Button.A, function () {
+    motor.moveMotor(100, stepUnit.Steps, direction.Clockwise)
+})
+input.onButtonPressed(Button.B, function () {
+    motor.moveMotor(1, stepUnit.Rotations, direction.AntiClockwise)
+})
+```
+
 
 ## Als Erweiterung verwenden
 
